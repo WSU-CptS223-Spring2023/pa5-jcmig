@@ -1,6 +1,23 @@
 /*
 PA5 done alone.
-1. 
+Note: Was unable to fully test as I was having issues with g++
+1.	Typically ChainingHash has better worst-case performance for insertion, removal and search
+	because collisions are resolved through seperate chaining. However, ProbingHash can be faster
+	when there are few collisions because it has beter cache utilization and reduced memory overhead.
+
+2.	It is expected that the parallel implementation would be faster, though this may not be the case
+	if the data set is small. In a scenario like that, serial implementation may be faster as the 
+	overhead of managing multiple threads or processes can outweigh the benefits of parallelization.
+	As for the parallel implementation, this is faster if the data set is large (which may be applicable
+	in our test case) due to the increased thread count.
+
+3. The following can be done:
+	-	Use a more efficient hashing algorithm: This is to reduce the number of collisions.
+	-	Reduce contention: This is done by using a fine-grained locking or a lock-free data structure.
+	-	Use a hybrid approach: Depending on the workload and number of threads, a hybrid approach
+							   that combines both serial and parallel implementations can be more efficient
+	-	Preallocating memory: Preallocating memory can reduce the overhead of memory management and improve performance
+
 */
 
 #include "ChainingHash.h"
