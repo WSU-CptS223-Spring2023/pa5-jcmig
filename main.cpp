@@ -1,7 +1,14 @@
+/*
+PA5 done alone.
+1. 
+*/
+
 #include "ChainingHash.h"
 #include "ProbingHash.h"
 //#include "ParallelProbingHash.h" 
 #include <omp.h>
+#include <iostream>
+#include <fstream>
 
 #define NUM_THREADS 2  // update this value with the number of cores in your system. 
 
@@ -14,9 +21,11 @@ int main()
 
 		// In order, insert values with keys 1 – 1,000,000. For simplicity, the key and value stored are the same. 
 		double startTime = omp_get_wtime();
-		for (int i = 1; i < 1000000; i++) {
+
+		for (int i = 1; i <= 1000000; i++) {
 			hashTable.insert(i, i);
 		}
+
 		double endTime = omp_get_wtime();
 
 		// Report the total amount of time, in seconds, required to insert the values to ChainingHash table. Write the results to a file called “HashAnalysis.txt”. 
@@ -67,9 +76,11 @@ int main()
 
 		// In order, insert values with keys 1 – 1,000,000. For simplicity, the key and value stored are the same.
 		startTime = omp_get_wtime();
-		for (int i = 1; i < 1000000; i++) {
+
+		for (int i = 1; i <= 1000000; i++) {
 			hashTable2.insert(i, i);
 		}
+
 		endTime = omp_get_wtime();
 
 		// Report the total amount of time, in seconds, required to insert the values to ProbingHash table. Write the results to a file called “HashAnalysis.txt”. 
@@ -79,7 +90,7 @@ int main()
 		// Search for the value with key 177 in ProbingHash table. Report the time required to find the value in each table by writing it to the “HashAnalysis.txt” file. 
 		startTime = omp_get_wtime();
 		val = hashTable2.search(177);
-		end_time = omp_get_wtime();
+		endTime = omp_get_wtime();
 		double searchTime2 = endTime - startTime;
 		outfile << "Linear Probing search time: " << searchTime2 << " seconds" << std::endl;
 
@@ -101,7 +112,7 @@ int main()
 		outfile << "Table size: " << hashTable2.size() << std::endl;
 		outfile << "Bucket count: " << hashTable2.bucket_count() << std::endl;
 		outfile << "Load factor: " << hashTable2.load_factor() << std::endl;
-		
+
 		/* Example output template:
 			Linear Probing insertion time: 
 			Linear Probing search time: 
@@ -116,22 +127,55 @@ int main()
       
 	  // (a) Using a single thread:  
 		//  create an object of type ParallelProbingHash 
+		ParallelProbingHash<int, int> pbHashTable1;
 
 		// Set the number of threads (omp_set_num_threads()) to 1 
+		omp_set_num_threads(1);
 
 		/* In an OpenMP parallel region (#pragma omp parallel), in order, insert values with keys 1 – 1,000,000. 
 		Inside the parallel region make sure that the value for the iteration number of the loop is shared among all threads. 
 		For simplicity, the key and value stored are the same.
         */
+		startTime = omp_get_wtime();
+
+		#pragma omp parallel shared(pbHashTable1) {
+			#pragma omp for
+			for (int i = 1; i <= 1000000; i++) {
+				pbHashTable1.insert(i, i);
+			}
+		}
+
+		endTime = omp_get_wtime();
+		double insertTime3 = endTime - startTime;
+
 		// Report the total amount of time, in seconds, required to insert the values to ParallelProbingHash table. Write the results to a file called “HashAnalysis.txt”. 
+		outfile << "Parallel Probing insertion time: " << insertTime3 << " seconds" << std::endl;
 
 		// Search for the value with key 177 in ParallelProbingHash table. Report the time required to find the value in each table by writing it to the “HashAnalysis.txt” file. 
-		
+		startTime = omp_get_wtime();
+		val = pbHashTable1.search(177);
+		endTime = omp_get_wtime();
+		double searchTime3 = endTime - startTime;
+		outfile << "Parallel Probing search time: " << searchTime3 << " seconds" << std::endl;
+
 		// Search for the value with key 2,000,000 in ParallelProbingHash table. Report the time required to find the value in each table by writing it to the file.  
+		startTime = omp_get_wtime();
+		val = pbHashTable1.search(2000000);
+		endTime = omp_get_wtime();
+		double failedSearchTime3 = endTime - startTime;
+		outfile << "Parallel Probing failed search time: " << failedSearchTime3 << " seconds" << std::endl;
 
 		// Remove the value with key 177 from ParallelProbingHash table. Report the time required to remove the value with in each table by writing it to the file.  
+		startTime = omp_get_wtime();
+		pbHashTable1.remove(177);
+		endTime = omp_get_wtime();
+		double removeTime3 = endTime - startTime;
+		outfile << "Parallel Probing deletion time: " << removeTime3 << " seconds" << std::endl;
 
 		// Also, write to the file the final size, bucket count, and load factor of the hash for ParallelProbingHash table. 
+		outfile << "Table size: " << pbHashTable1.size() << std::endl;
+		outfile << "Bucket count: " << pbHashTable1.bucket_count() << std::endl;
+		outfile << "Load factor: " << pbHashTable1.load_factor() << std::endl;
 
 		/* Example output template:
 			Parallel Probing insertion time: 
@@ -145,22 +189,53 @@ int main()
 
 	// (b) Using multiple threads:  
 		//  create an object of type ParallelProbingHash 
+		ParallelProbingHash<int, int> pbHashTable2;
 
 		// i.	Change the number of threads to match the number of cores on your system 
+		omp_set_num_threads(NUM_THREADS);
 
 		/* In an OpenMP parallel region (#pragma omp parallel), in order, insert values with keys 1 – 1,000,000. 
 		Inside the parallel region make sure that the value for the iteration number of the loop is shared among all threads. 
 		For simplicity, the key and value stored are the same.
         */
+		startTime = omp_get_wtime();
+		#pragma omp parallel shared(pbHashTable2) {
+			#pragma omp for schedule(static)
+			for (int i = 1; i <= 1000000; i++) {
+				pbHashTable2.insert(i, i);
+			}
+		}
+		endTime = omp_get_wtime();
+
 		// Report the total amount of time, in seconds, required to insert the values to ParallelProbingHash table. Write the results to a file called “HashAnalysis.txt”. 
+		double insertTime4 = endTime - startTime;
+		outfile << "Parallel Probing insertion time: " << insertTime4 << " seconds" << std::endl;
 
 		// Search for the value with key 177 in ParallelProbingHash table. Report the time required to find the value in each table by writing it to the “HashAnalysis.txt” file. 
-		
+		startTime = omp_get_wtime();
+		val = pbHashTable2.search(177);
+		endTime = omp_get_wtime();
+		double searchTime4 = endTime - startTime;
+		outfile << "Parallel Probing search time: " << searchTime4 << " seconds" << std::endl;
+
 		// Search for the value with key 2,000,000 in ParallelProbingHash table. Report the time required to find the value in each table by writing it to the file.  
+		startTime = omp_get_wtime();
+		val = pbHashTable2.search(2000000);
+		endTime = omp_get_wtime();
+		double failedSearchTime4 = endTime - startTime;
+		outfile << "Parallel Probing failed search time: " << failedSearchTime4 << " seconds" << std::endl;
 
 		// Remove the value with key 177 from ParallelProbingHash table. Report the time required to remove the value with in each table by writing it to the file.  
+		startTime = omp_get_wtime();
+		pbHashTable2.remove(177);
+		endTime = omp_get_wtime();
+		double removeTime4 = endTime - startTime;
+		outfile << "Parallel Probing deletion time: " << removeTime4 << " seconds" << std::endl;
 
 		// Also, write to the file the final size, bucket count, and load factor of the hash for ParallelProbingHash table. 
+		outfile << "Table size: " << pbHashTable2.size() << std::endl;
+		outfile << "Bucket count: " << pbHashTable2.bucket_count() << std::endl;
+		outfile << "Load factor: " << pbHashTable2.load_factor() << std::endl;
 
 		/* Example output template:
 			Parallel Probing insertion time: 
@@ -171,5 +246,8 @@ int main()
 			Bucket count: 
 			Load factor: 
 		*/
+	
+	outfile.close();
+
 	return 0;
 }
