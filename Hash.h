@@ -10,7 +10,7 @@
 #ifndef __Hash_H
 #define __Hash_H
 
-// Hash class interface notes
+// Hash class interface notes. 
 // ******************PUBLIC OPERATIONS*********************
 // bool empty( )                            --> Test for empty hash
 // int size( )                              --> Quantity of (non-deleted) elements in hash
