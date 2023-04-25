@@ -229,4 +229,4 @@ private:
     
 };
 
-#endif //__PROBING_HASH_H
+#endif //__PARALLEL_PROBING_HASH_H
